@@ -5,6 +5,7 @@
  */
 class Funds {
     private val ledger = Array<MutableList<Record>>(10) { mutableListOf() }
+    private val frozenAccounts = arrayOf(5)
 
     /**
      * Calculates the total available funds for a specific account by aggregating
@@ -31,7 +32,7 @@ class Funds {
      * @param amount The amount to be deposited into the account.
      */
     fun deposit(account: Int, amount: Int) {
-        ledger[account].add(Deposit(amount))
+        appendToLedgerIfNotFrozen(account, Deposit(amount))
     }
 
     /**
@@ -41,8 +42,27 @@ class Funds {
      * @param amount The amount to be withdrawn from the account.
      */
     fun withdraw(account: Int, amount: Int) {
-        ledger[account].add(Withdrawal(amount))
+        appendToLedgerIfNotFrozen(account, Withdrawal(amount))
     }
+
+    /**
+     * Appends a transaction record to the ledger of the specified account
+     * if the account is not marked as frozen.
+     *
+     * @param account The identifier of the account to which the record should be appended.
+     * @param record The financial transaction record to be added to the account's ledger.
+     */
+    fun appendToLedgerIfNotFrozen(account: Int, record: Record) {
+        if (!isAccountFrozen(account)) ledger[account].add(record)
+    }
+    
+    /**
+     * Checks if the specified account is suspended.
+     *
+     * @param account The identifier of the account to be checked for suspension status.
+     * @return `true` if the account is suspended, `false` otherwise.
+     */
+    fun isAccountFrozen(account: Int) = frozenAccounts.contains(account)
 }
 
 /**
@@ -100,26 +120,18 @@ class Bank {
      */
     fun transfer(from: Int, to: Int, amount: Int) {
         val currentAmountFrom = funds.getFundFor(from)
-
         if (currentAmountFrom - amount < -1000) {
             println("Insufficient funds")
             return
         }
-
-        if (!isAccountSuspended(from)) {
-            funds.withdraw(
-                account = from,
-                amount = amount,
-            )
-        }
-
-        if (!isAccountSuspended(to)) {
-            funds.deposit(
-                account = to,
-                amount = amount
-            )
-        }
-
+        funds.withdraw(
+            account = from,
+            amount = amount
+        )
+        funds.deposit(
+            account = to,
+            amount = amount
+        )
     }
 
     /**
