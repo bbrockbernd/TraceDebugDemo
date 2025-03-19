@@ -16,6 +16,7 @@ class FundsTest {
             val amount = Random.nextInt(1, 500)
             bank.transfer(from, to, amount)
         }
+//        check(bankTotalBeforeTransfers == bank.bankTotal()) {"Mismatch before and after trasnfers"}
         assertEquals(bankTotalBeforeTransfers, bank.bankTotal())
     }
 

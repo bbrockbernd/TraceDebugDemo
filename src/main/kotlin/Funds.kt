@@ -31,8 +31,8 @@ class Funds {
      * @param account The identifier of the account into which the deposit is being made.
      * @param amount The amount to be deposited into the account.
      */
-    fun deposit(account: Int, amount: Int) {
-        appendToLedgerIfNotFrozen(account, Deposit(amount))
+    fun deposit(account: Int, amount: Int): Boolean {
+        return appendToLedgerIfNotFrozen(account, Deposit(amount))
     }
 
     /**
@@ -41,8 +41,8 @@ class Funds {
      * @param account The identifier of the account from which the withdrawal is being made.
      * @param amount The amount to be withdrawn from the account.
      */
-    fun withdraw(account: Int, amount: Int) {
-        appendToLedgerIfNotFrozen(account, Withdrawal(amount))
+    fun withdraw(account: Int, amount: Int): Boolean {
+        return appendToLedgerIfNotFrozen(account, Withdrawal(amount))
     }
 
     /**
@@ -52,8 +52,12 @@ class Funds {
      * @param account The identifier of the account to which the record should be appended.
      * @param record The financial transaction record to be added to the account's ledger.
      */
-    fun appendToLedgerIfNotFrozen(account: Int, record: Record) {
-        if (!isAccountFrozen(account)) ledger[account].add(record)
+    fun appendToLedgerIfNotFrozen(account: Int, record: Record): Boolean {
+        if (!isAccountFrozen(account)) {
+            ledger[account].add(record)
+            return true
+        }
+        return false
     }
     
     /**
@@ -115,10 +119,14 @@ class Bank(initialBalances: List<Int>) {
     private val funds = Funds().apply { initLedger(accounts) }
     
     init {
-        for (i in 0..< accounts) {
-            funds.deposit(i, initialBalances[i]) 
-        }
+        initAccounts(initialBalances)
         funds.freezeAccount(5)
+    }
+    
+    private fun initAccounts(initialBalances: List<Int>) {
+        for (i in 0..< accounts) {
+            funds.deposit(i, initialBalances[i])
+        }
     }
 
     /**
