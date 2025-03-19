@@ -5,7 +5,7 @@
  */
 class Funds {
     private val ledger: Array<MutableList<Record>> = initLedger(10)
-    private val frozenAccounts = listOf(5)
+    private val frozenAccounts = initFrozen()
 
     /**
      * Calculates the total available funds for a specific account by aggregating
@@ -70,6 +70,11 @@ class Funds {
 fun initLedger(size: Int): Array<MutableList<Record>> {
     return Array(size) { mutableListOf() }
 }
+
+fun initFrozen(): Array<Int> {
+    return arrayOf(5)
+}
+
 /**
  * Represents a financial transaction record in the ledger system.
  *
