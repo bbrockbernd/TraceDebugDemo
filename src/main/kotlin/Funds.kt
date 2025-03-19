@@ -5,7 +5,7 @@
  */
 class Funds {
     private val ledger: Array<MutableList<Record>> = initLedger(10)
-    private val frozenAccounts = initFrozen()
+    private val frozenAccounts = mutableListOf<Int>()
 
     /**
      * Calculates the total available funds for a specific account by aggregating
@@ -63,16 +63,20 @@ class Funds {
      * @return `true` if the account is suspended, `false` otherwise.
      */
     fun isAccountFrozen(account: Int) = frozenAccounts.contains(account)
+    
+    
+    /**
+     * Marks the specified account as frozen, preventing it from participating in new transactions.
+     *
+     * @param account The identifier of the account to be frozen.
+     */
+    fun freezeAccount(account: Int) = frozenAccounts.add(account)
 
 
 }
 
 fun initLedger(size: Int): Array<MutableList<Record>> {
     return Array(size) { mutableListOf() }
-}
-
-fun initFrozen(): Array<Int> {
-    return arrayOf(5)
 }
 
 /**
@@ -106,8 +110,16 @@ data class Deposit(val amount: Int) : Record
  * The class internally interacts with the `Funds` class to manage account balances and track financial
  * transactions, such as deposits and withdrawals.
  */
-class Bank {
-    private val funds = Funds().apply { initLedger(10) }
+class Bank(initialBalances: List<Int>) {
+    private val accounts = initialBalances.size
+    private val funds = Funds().apply { initLedger(accounts) }
+    
+    init {
+        for (i in 0..accounts) {
+            funds.deposit(i, initialBalances[i]) 
+        }
+        funds.freezeAccount(5)
+    }
 
     /**
      * Retrieves the total available funds for the specified account.
@@ -129,7 +141,7 @@ class Bank {
      */
     fun transfer(from: Int, to: Int, amount: Int) {
         val currentAmountFrom = funds.getFundFor(from)
-        if (currentAmountFrom - amount < -1000) {
+        if (currentAmountFrom - amount < 0) {
             println("Insufficient funds")
             return
         }
@@ -163,9 +175,9 @@ class Bank {
      * This function is primarily used to ensure that the system's accounting records
      * are consistent and accurate.
      */
-    fun validateFunds(): Int {
+    fun bankTotal(): Int {
         var total = 0
-        repeat(10) { i ->
+        repeat(accounts) { i ->
             total += funds.getFundFor(i)
         }
         return total
