@@ -4,8 +4,8 @@
  * through basic operations such as depositing and withdrawing funds.
  */
 class Funds {
-    private val ledger = Array<MutableList<Record>>(10) { mutableListOf() }
-    private val frozenAccounts = arrayOf(5)
+    private val ledger: Array<MutableList<Record>> = initLedger(10)
+    private val frozenAccounts = listOf(5)
 
     /**
      * Calculates the total available funds for a specific account by aggregating
@@ -63,8 +63,13 @@ class Funds {
      * @return `true` if the account is suspended, `false` otherwise.
      */
     fun isAccountFrozen(account: Int) = frozenAccounts.contains(account)
+
+
 }
 
+fun initLedger(size: Int): Array<MutableList<Record>> {
+    return Array(size) { mutableListOf() }
+}
 /**
  * Represents a financial transaction record in the ledger system.
  *
@@ -97,8 +102,7 @@ data class Deposit(val amount: Int) : Record
  * transactions, such as deposits and withdrawals.
  */
 class Bank {
-    private val funds = Funds()
-    private val suspendedAccounts = arrayOf(5)
+    private val funds = Funds().apply { initLedger(10) }
 
     /**
      * Retrieves the total available funds for the specified account.
@@ -140,7 +144,7 @@ class Bank {
      * @param account The identifier of the account to be checked for suspension status.
      * @return `true` if the account is suspended, `false` otherwise.
      */
-    fun isAccountSuspended(account: Int) = suspendedAccounts.contains(account)
+    fun isAccountSuspended(account: Int) = funds.isAccountFrozen(account)
 
 
     /**
