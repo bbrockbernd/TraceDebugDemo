@@ -115,7 +115,7 @@ class Bank(initialBalances: List<Int>) {
     private val funds = Funds().apply { initLedger(accounts) }
     
     init {
-        for (i in 0..accounts) {
+        for (i in 0..< accounts) {
             funds.deposit(i, initialBalances[i]) 
         }
         funds.freezeAccount(5)

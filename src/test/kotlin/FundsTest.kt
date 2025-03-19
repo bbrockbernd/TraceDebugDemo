@@ -6,8 +6,8 @@ class FundsTest {
 
     @Test
     fun testTransfers() {
-        val initialBalances = listOf(1000, 2000, 1500, 300, 1000, 650, 700, 1200, 900, 1100)
-        val bank = Bank(initialBalances)
+        val initialBalances = bankScenario()
+        val bank = Bank(bankScenario())
         val bankTotalBeforeTransfers = bank.bankTotal()
         assertEquals(initialBalances.sum(), bankTotalBeforeTransfers)
         repeat(20) {
@@ -18,4 +18,9 @@ class FundsTest {
         }
         assertEquals(bankTotalBeforeTransfers, bank.bankTotal())
     }
+
+}
+
+private fun bankScenario(): List<Int> {
+    return listOf(1000, 2000, 1500, 300, 1000, 650, 700, 1200, 900, 1100)
 }
